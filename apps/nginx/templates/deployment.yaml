@@ -1,61 +1,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "nginx.fullname" . }}
-  labels:
-    {{- include "nginx.labels" . | nindent 4 }}
+  name: {{ .Values.container.appName }}-{{ .Values.container.environment }}
+  namespace: {{ .Values.container.namespace }}
+  annotations:
+    kubernetes.io/change-cause: "Deployed image tag {{ .Values.image.tag }}"
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .Values.replicas.nginx }}
   selector:
     matchLabels:
-      {{- include "nginx.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.container.appName }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-{{ .Values.container.environment }}-{{ .Values.container.appName }}: "{{ .Values.vault.secretLocation }}"
+        vault.hashicorp.com/agent-inject-template-{{ .Values.container.environment }}-{{ .Values.container.appName }}:
+        {{ toYaml .Values.vault.vaultSecretTemplate | indent 8 }}
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/role: app-role
       labels:
-        {{- include "nginx.selectorLabels" . | nindent 8 }}
+        app: {{ .Values.container.appName }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "nginx.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+      serviceAccountName: vault-app
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        Role: {{ .Values.cluster.nodeSelector }}
+      {{- if .Values.readinessProbe.enabled }}
+      readinessProbe:
+        httpGet:
+          path: /
+          port: {{.Values.container.port }}
+        initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+        periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+        timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+        failureSeconds: {{ .Values.readinessProbe.failureThreshold }}
       {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      containers:
+        - name: {{ .Values.container.appName }}-{{ .Values.container.environment }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - name: http-port
+            containerPort: {{ .Values.container.port }}
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"

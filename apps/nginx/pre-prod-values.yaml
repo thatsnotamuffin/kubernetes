@@ -1,0 +1,73 @@
+# Deployment
+cluster:
+  name: thatsnotamuffin-pre-prod-cluster
+  nodeSelector: general-use
+
+container:
+  appName: nginx
+  environment: pre-prod
+  namespace: pre-prod
+  port: 80
+
+image:
+  tag: latest
+  repository: nginx
+  pullPolicy: IfNotPresent
+
+replicas:
+  nginx: 2
+
+# Readiness Probe
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 10
+
+# Vault
+vault:
+  secretLocation: secret/pre-prod/nginx
+  vaultSecretTemplate: |
+    {{ with secret "secret/pre-prod/nginx" }}
+    {{ range $k, $v := .Data.data }}
+    export {{ $k }}='{{ $v }}'
+    {{ end }}
+    {{ end }}
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256M
+  requests:
+    cpu: 250m
+    memory: 128M
+
+# HPA
+hpa:
+  enabled: true
+  nginx:
+    maxReplicas: 4
+    type: Utilization
+    value: 80
+
+# Service
+service:
+  type: NodePort
+  serviceName: nginx-nodeport
+  port: 80
+  targetPort: 80
+
+# Ingress
+ingress:
+  enabled: true
+  name: nginx-ingress
+  host: nginx.myurl.com
+  className: "alb"
+  hostname: nginx.myurl.com.
+  certificateArn: arn:aws:acm:us-east-1:111222333444:certificate/111aaa222bbb-33cc-44dd-55ee-666fff777ggg
+
+# Tags
+tags:
+  region: us-east-1
+  environment: pre-prod
