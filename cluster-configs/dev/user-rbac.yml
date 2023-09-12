@@ -1,0 +1,46 @@
+---
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::111222333444:role/eks-node-role
+      username: system:node:{{EC2PrivateDNSName}}
+  mapUsers: |
+    - userarn: arn:aws:iam::111222333444:user/github-user
+      username: github-user
+      groups:
+        - muffin:github
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-4
+      username: thatsnotamuffin-user-4
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-5
+      username: thatsnotamuffin-user-5
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-6
+      username: thatsnotamuffin-user-6
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-1
+      username: thatsnotamuffin-user-1
+      groups:
+        - muffin:developers
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-2
+      username: thatsnotamuffin-user-2
+      groups:
+        - muffin:developers
+    - userarn: arn:aws:iam::111222333444:user/thatsnotamuffin-user-3
+      username: thatsnotamuffin-user-3
+      groups:
+        - muffin:developers

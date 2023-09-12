@@ -1,0 +1,89 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: thatsnotamuffin-dev-cluster
+  region: us-east-1
+
+nodeGroups:
+  - name: muffin-ng1-{{EKSVERSION}}
+    labels: {Role: muffin-workers}
+    amiFamily: "AmazonLinux2"
+    instanceType: m5.xlarge
+    subnets:
+      - subnet-111aaa
+      - subnet-222bbb
+    desiredCapacity: 5
+    minSize: 5
+    maxSize: 20
+    volumeSize: 50
+    volumeType: gp3
+    volumeEncrypted: true
+    volumeKmsKeyID: "111aaa-22bb-33cc-44cc-555ee666fff"
+    ssh:
+      allow: true
+      publicKeyName: "dev-admin"
+    privateNetworking: false
+    securityGroups:
+      withShared: true
+      attachIDs: ['sg-111aaa', 'sg-222bbb', 'sg-333ccc']
+    iam:
+      instanceRoleARN: "arn:aws:iam::111222333444:role/eks-node-role"
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/thatsnotamuffin-dev-cluster: "owned"
+
+  - name: muffin-ng2-{{EKSVERSION}}
+    labels: {Role: general-use}
+    amiFamily: "AmazonLinux2"
+    instanceType: m5.xlarge
+    subnets:
+      - subnet-111aaa
+      - subnet-222bbb
+    desiredCapacity: 5
+    minSize: 5
+    maxSize: 20
+    volumeSize: 50
+    volumeType: gp3
+    volumeEncrypted: true
+    volumeKmsKeyID: "111aaa-22bb-33cc-44cc-555ee666fff"
+    ssh:
+      allow: true
+      publicKeyName: "dev-admin"
+    privateNetworking: false
+    securityGroups:
+      withShared: true
+      attachIDs: ['sg-111aaa', 'sg-222bbb', 'sg-333ccc']
+    iam:
+      instanceRoleARN: "arn:aws:iam::111222333444:role/eks-node-role"
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/thatsnotamuffin-dev-cluster: "owned"
+
+  - name: vault-{{EKSVERSION}}
+    labels: {Role: vault}
+    amiFamily: "AmazonLinux2"
+    instanceType: t3.small
+    subnets:
+      - subnet-111aaa
+      - subnet-222bbb
+    desiredCapacity: 3
+    minSize: 3
+    maxSize: 3
+    volumeSize: 10
+    volumeType: gp3
+    volumeEncrypted: true
+    volumeKmsKeyID: "111aaa-22bb-33cc-44cc-555ee666fff"
+    ssh:
+      allow: true
+      publicKeyName: "dev-admin"
+    privateNetworking: false
+    securityGroups:
+      withShared: true
+      attachIDs: ['sg-111aaa', 'sg-222bbb', 'sg-333ccc']
+    iam:
+      instanceRoleARN: "arn:aws:iam::111222333444:role/eks-node-role"
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/thatsnotamuffin-dev-cluster: "owned"

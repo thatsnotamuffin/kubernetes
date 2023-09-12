@@ -1,0 +1,31 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: thatsnotamuffin-prod-cluster
+  region: us-east-1
+  version: "1.24"
+  tags:
+    'env': 'Development'
+    'basedomain': 'myurl.com'
+
+vpc:
+  id: "vpc-111aaa"
+  cidr: "10.0.0.0/19"
+  subnets:
+    public:
+      us-east-1b: {id: subnet-111aaa}
+      us-east-1e: {id: subnet-222bbb}
+  clusterEndpoints:
+    privateAccess: false
+    publicAccess: true
+
+iam:
+  serviceRoleARN: "arn:aws:iam::111222333444:role/eks-cluster-role"
+
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - "api"
+      - "audit"
+      - "authenticator"
