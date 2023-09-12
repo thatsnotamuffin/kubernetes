@@ -1,0 +1,14 @@
+### VS Code ###
+.vscode/
+
+### Terraform ###
+.terraform/
+*.tfstate
+*.tfstate.*
+*.out
+.history/
+*.terraform.lock.hcl
+.terraform.lock.hcl
+
+.DS_Store
+
