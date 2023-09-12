@@ -22,13 +22,26 @@ spec:
       labels:
         app: {{ .Values.container.appName }}
     spec:
+      serviceAccountName: vault-app
+      nodeSelector:
+        Role: {{ .Values.cluster.nodeSelector }}
+      {{- if .Values.readinessProbe.enabled }}
+      readinessProbe:
+        httpGet:
+          path: /
+          port: {{.Values.container.port }}
+        initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+        periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+        timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+        failureSeconds: {{ .Values.readinessProbe.failureThreshold }}
+      {{- end }}
       containers:
-        - name: {{ .Values.container.appName }}-{{ .Values.container.environment }}-web
+        - name: {{ .Values.container.appName }}-{{ .Values.container.environment }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - name: http-port
-            containerPort: 80
+            containerPort: {{ .Values.container.port }}
         resources:
           limits:
             cpu: "{{ .Values.resources.limits.cpu }}"
