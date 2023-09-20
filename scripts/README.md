@@ -2,28 +2,28 @@
 Some of these scripts are used to "automate" slightly longer commands in the spirit of lazy. Most notably the `pod_exec.sh` - `pod_describe.sh` - `pod_log.sh` - `deploy_scale.sh` scripts.
 
 #### Pod Exec
-This script requires a pod name and shell are provided
+[pod_exec.sh](pod_exec.sh) Starts an interactive shell in a specified pod. Requires a pod name and shell
 
 ```bash
 bash pod_exec.sh my-pod bash
 ```
 
 #### Pod Describe
-This script runs a `kubectl describe pod` command on a provided pod. Only a pod name is required
+[pod_describe.sh](pod_describe.sh) This script runs a `kubectl describe pod` command on a provided pod. Only a pod name is required
 
 ```bash
 bash pod_describe my-pod
 ```
 
 #### Pod Log
-Grabs the logs of a pod. Only the pod name is required - NOTE: tailing the log is not supported as of the moment
+[pod_log.sh](pod_log.sh) Grabs the logs of a pod. Only the pod name is required - NOTE: tailing the log is not supported as of the moment
 
 ```bash
 bash pod_log.sh my-pod
 ```
 
 #### Deploy Scale
-Scales a deployment to a provided number of replicas. The direction of the scaling isn't forced (scaling up or scaling down). The number of replicas to scale to and the deployment name are required
+[deploy_scale.sh](deploy_scale.sh) Scales a deployment to a provided number of replicas. The direction of the scaling isn't forced (scaling up or scaling down). The number of replicas to scale to and the deployment name are required
 
 ```bash
 bash deploy-scale.sh 3 my-deploy
