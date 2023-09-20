@@ -12,11 +12,11 @@ show_usage() {
     echo "Example Usage: ./hpa_resources.sh -n my-hpa -N my-namespace -m 3 -M 5"
     printf "\n"
     echo "Options:"
-    echo "  -h, --help          Show this help message"
-    echo "  -n, --hpa-name      Name of the HPA to edit"
-    echo "  -N, --namespace     Namespace where the HPA exists"
-    echo "  -m, --min-replicas  Edit the minimum amount of replicas"
-    echo "  -M, --max-replicas  Edit the maximum amount of replicas"
+    echo "  -h, --help              Show this help message"
+    echo "  -n, --hpa-name          Name of the HPA to edit"
+    echo "  -N, --namespace         Namespace where the HPA exists"
+    echo "  -m, --min-replicas      Edit the minimum amount of replicas"
+    echo "  -M, --max-replicas      Edit the maximum amount of replicas"
     printf "\n"
 }
 
