@@ -6,7 +6,8 @@ edit_replicas=false
 show_usage() {
     printf "\n"
     echo "Usage: ./hpa_resources.sh [OPTIONS]"
-    echo "All options are required"
+    echo "HPA Name (-n) and Namespace (-N) are required"
+    echo "NOTE: If any option, outside of those required, isn't provided - this script will attempt to discover the current resource value and apply that value."
     printf "\n"
     echo "Example Usage: ./hpa_resources.sh -n my-hpa -N my-namespace -m 3 -M 5"
     printf "\n"
@@ -33,15 +34,11 @@ replica_update() {
     fi
 
     if [ -z "$min_replicas" ]; then
-        echo "Minimum Replicas is required. Aborting..."
-        show_usage
-        return 1
+        min_replicas=$(kubectl get hpa/$hpa_name -n $namespace -o=jsonpath='{.spec.minReplicas}' 2>/dev/null)
     fi
 
     if [ -z "$max_replicas" ]; then
-        echo "Maximum Replicas is required. Aborting..."
-        show_usage
-        return 1
+        max_replicas=$(kubectl get hpa/$hpa_name -n $namespace -o=jsonpath='{.spec.minReplicas}' 2>/dev/null)
     fi
 
     kubectl patch hpa/$hpa_name -p \
@@ -79,7 +76,7 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         *)
-            echo "Invalid option: -$OPTARG" >&2
+            echo "Invalid option: $1" >&2
             show_usage
             exit 1
             ;;
